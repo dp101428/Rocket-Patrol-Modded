@@ -7,6 +7,14 @@ class Rocket extends Phaser.GameObjects.Sprite {
         this.isFiring = false;
         //add the sound from the scene that made this
         this.sfxRocket = scene.sound.add('sfx_rocket');
+        
+
+        //Combo system, multipler starts at 1
+        this.multiplier = 1;
+
+        //Also need to track last ship hit, for efficiency do it by index
+        // -1 means no last hit
+        this.lastHit = -1;
     }
 
     update(){
@@ -31,6 +39,8 @@ class Rocket extends Phaser.GameObjects.Sprite {
         //if we didn't hit, reset rocket if hit ceiling
         if(this.y <= 108){
             this.reset();
+            this.lastHit = -1;
+            this.multiplier = 1;
         }
     }
 

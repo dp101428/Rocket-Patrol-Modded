@@ -94,11 +94,24 @@ class Play extends Phaser.Scene{
         }
 
         //update all the ships
-        this.ships.forEach((ship) => {
+        this.ships.forEach((ship, index) => {
             ship.update();
             if(this.checkCollision(this.p1Rocket, ship)){
                 this.p1Rocket.reset();
                 this.shipExplode(ship);
+
+                //add the score
+                this.p1Score += ship.points * this.p1Rocket.multiplier;
+                this.scoreLeft.text = this.p1Score;
+                //Then figure out how multiplier should change.
+                //If this is the first hit after a miss, or first ever, or same as prior, add 10% of the points
+                if(this.p1Rocket.lastHit == -1 || this.ships[this.p1Rocket.lastHit] == ship)
+                    this.p1Rocket.multiplier += ship.points/10;
+                //If it's a new ship, add twice as much
+                //Could be done without an else, but this is clearer
+                else
+                    this.p1Rocket.multiplier += ship.points/5;
+                this.p1Rocket.lastHit = index;
             }
         });
     }
@@ -125,9 +138,7 @@ class Play extends Phaser.Scene{
             ship.alpha=1;
             boom.destroy();
         });
-        //add the score
-        this.p1Score += ship.points;
-        this.scoreLeft.text = this.p1Score;
+        
         this.sound.play('sfx_explosion');
     }
 }
