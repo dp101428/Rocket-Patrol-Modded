@@ -46,7 +46,11 @@ class Rocket extends Phaser.GameObjects.Sprite {
             this.reset();
             this.lastHit = -1;
             this.multiplier = 1;
+            //Need to then tell the game that we reset for multi display purposes
+            return true;
         }
+        //If we didn't hit anything, don't need to change multi
+        return false;
     }
 
     //runs after colliding with spaceship

@@ -67,6 +67,8 @@ class Play extends Phaser.Scene{
         //this tells the game what to display and how to display it?
         this.scoreLeft = this.add.text(69, 54, this.p1Score, scoreConfig);
 
+        //Also want to display the multiplier
+        this.multi = this.add.text(240, 54, 1 + "x", scoreConfig);
         //game over flag
         this.gameOver = false;
         //clock for the game
@@ -82,6 +84,7 @@ class Play extends Phaser.Scene{
         //handle post-game choices.
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyF)){
             this.scene.restart(this.p1Score);
+            this.scene.restart(this.multi);
         }
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             this.scene.start("menuScene");
@@ -90,7 +93,8 @@ class Play extends Phaser.Scene{
         this.starfield.tilePositionX -= 4;
         //update rocket
         if(!this.gameOver){
-            this.p1Rocket.update();
+            if(this.p1Rocket.update())
+                this.multi.text = 1 + "x";
         }
 
         //update all the ships
@@ -112,6 +116,7 @@ class Play extends Phaser.Scene{
                 else
                     this.p1Rocket.multiplier += ship.points/5;
                 this.p1Rocket.lastHit = index;
+                this.multi.text = this.p1Rocket.multiplier + "x";
             }
         });
     }
