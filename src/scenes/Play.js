@@ -93,13 +93,14 @@ class Play extends Phaser.Scene{
 
         //Also want to display the multiplier
         this.multi = this.add.text(220, 54, 1 + "x", scoreConfig);
-
-
         //And display the time remaining
         this.timeDisp = this.add.text(360, 54, game.settings.gameTimer/1000, scoreConfig);
 
+        //Need a slightly different config for high score to be wide enough
+        let highScoreConfig = scoreConfig;
+        highScoreConfig.fixedWidth = 120;
         //Also high score somewhere
-        this.hiDisplay = this.add.text(480, 54, "HS: " + highScore, scoreConfig);
+        this.hiDisplay = this.add.text(480, 54, "HS:" + highScore, highScoreConfig);
 
         //game over flag
         this.gameOver = false;
@@ -113,7 +114,6 @@ class Play extends Phaser.Scene{
             this.paused = true;
             this.p1Rocket.multiplier = 1;
             this.multi.text = 1 + "x";
-
         }, null, this);
 
         //Clock timed to start 2nd player
@@ -124,6 +124,7 @@ class Play extends Phaser.Scene{
             this.midText2.alpha = 0;
             this.p1Rocket.x = game.config.width/2;
             this.p1Rocket.reset();
+            this.scoreLeft.text = 0;
         }, null, this);
 
         //clock to run down for 2-player game
@@ -134,10 +135,15 @@ class Play extends Phaser.Scene{
                            'P1 score: '+ this.score[0] + ", P2 score: "+this.score[1], scoreConfig).setOrigin(0.5);
             this.gameOver = true;
             this.paused = true;
+            //console.log(this.score[0]);
+            //console.log  (this.score[1]);
+            //console.log(Math.max(this.score[0], this.score[1]));
+            //console.log(highScore);
+            
             highScore = Math.max(Math.max(this.score[0], this.score[1]), highScore);
-            this.hiDisplay.text = "HS: " + this.highScore;
+            this.hiDisplay.text = "HS:" + highScore;
         }, null, this);
-        
+
 
     }
 
