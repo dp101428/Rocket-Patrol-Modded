@@ -13,5 +13,5 @@ Create your own mod - Combo system for taking out ships sequentially - 25 points
   
 Display time remaining - 15 points
 
-Add particle emitter - 25 points
-  - Added to both ship death and ship exhaust
+Add particle emitter when ship dies - 25 points
+  - Also added particle emitter for ship exhaust
