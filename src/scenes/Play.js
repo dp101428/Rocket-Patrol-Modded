@@ -16,7 +16,10 @@ class Play extends Phaser.Scene{
         //Load other particle for exhaust
         this.load.image('exhaust', './assets/particle2.png')
     }
+
     create(){
+        //if(typeof this.highScore === 'undefined')
+        //    this.highScore = 0;
         //place tile sprite
         this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0,0);
 
@@ -89,10 +92,15 @@ class Play extends Phaser.Scene{
         this.scoreLeft = this.add.text(69, 54, this.score[this.scoreIndex], scoreConfig);
 
         //Also want to display the multiplier
-        this.multi = this.add.text(240, 54, 1 + "x", scoreConfig);
+        this.multi = this.add.text(220, 54, 1 + "x", scoreConfig);
+
 
         //And display the time remaining
-        this.timeDisp = this.add.text(400, 54, game.settings.gameTimer/1000, scoreConfig);
+        this.timeDisp = this.add.text(360, 54, game.settings.gameTimer/1000, scoreConfig);
+
+        //Also high score somewhere
+        this.hiDisplay = this.add.text(480, 54, "HS: " + highScore, scoreConfig);
+
         //game over flag
         this.gameOver = false;
         //Side done flag
@@ -125,6 +133,8 @@ class Play extends Phaser.Scene{
                            'P1 score: '+ this.score[0] + ", P2 score: "+this.score[1], scoreConfig).setOrigin(0.5);
             this.gameOver = true;
             this.paused = true;
+            highScore = Math.max(this.score[0], this.score[1]);
+            this.hiDisplay.text = "HS: " + this.highScore;
         }, null, this);
 
 

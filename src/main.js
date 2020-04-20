@@ -4,7 +4,7 @@ let config = {
     height: 480,
     scene: [Menu, Play],
 };
-
+let highScore = 0;
 let game = new Phaser.Game(config);
 game.settings = {
     spaceshipSpeed: 3,
