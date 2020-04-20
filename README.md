@@ -18,3 +18,4 @@ Add particle emitter when ship dies - 25 points
   
 Add sequential multiplayer - 25 points
 
+Added high scores - 10 points
