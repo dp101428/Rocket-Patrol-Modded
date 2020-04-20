@@ -69,6 +69,9 @@ class Play extends Phaser.Scene{
 
         //Also want to display the multiplier
         this.multi = this.add.text(240, 54, 1 + "x", scoreConfig);
+
+        //And display the time remaining
+        this.timeDisp = this.add.text(400, 54, game.settings.gameTimer/1000, scoreConfig);
         //game over flag
         this.gameOver = false;
         //clock for the game
@@ -80,7 +83,7 @@ class Play extends Phaser.Scene{
         }, null, this);
     }
 
-    update(){
+    update(currTime, dT){
         //handle post-game choices.
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyF)){
             this.scene.restart(this.p1Score);
@@ -119,6 +122,13 @@ class Play extends Phaser.Scene{
                 this.multi.text = this.p1Rocket.multiplier + "x";
             }
         });
+
+        //Update the displayed time
+        //If the game is over, should just show 0
+        if(!this.gameOver)
+            this.timeDisp.text = 1 + Math.floor((game.settings.gameTimer - this.clock.getElapsed())/1000);
+        else
+            this.timeDisp.text = "0";
     }
 
     checkCollision(rocket, ship){
