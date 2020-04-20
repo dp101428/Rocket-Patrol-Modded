@@ -100,19 +100,25 @@ class Play extends Phaser.Scene{
         //clock for the game
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, ()=>{
-            this.add.text(game.config.width/2, game.config.height/2, 'P1 Finished', scoreConfig).setOrigin(0.5);
-            this.add.text(game.config.width/2, game.config.height/2 + 64, 'P2 starts in 5 seconds', scoreConfig).setOrigin(0.5);
+            this.midText1 = this.add.text(game.config.width/2, game.config.height/2, 'P1 Finished', scoreConfig).setOrigin(0.5);
+            this.midText2 = this.add.text(game.config.width/2, game.config.height/2 + 64, 'P2 starts in 5 seconds', scoreConfig).setOrigin(0.5);
             this.paused = true;
+            this.p1Rocket.multiplier = 1;
+            this.multi.text = 1 + "x";
+
         }, null, this);
 
         //Clock timed to start 2nd player
-        this.clock = this.time.delayedCall(game.settings.gameTimer + 5000, ()=>{
+        this.gapClock = this.time.delayedCall(game.settings.gameTimer + 5000, ()=>{
             this.paused = false;
             this.scoreIndex = 1;
+            this.midText1.alpha = 0;
+            this.midText2.alpha = 0;
+            this.p1Rocket.x = game.config.width/2;
         }, null, this);
 
         //clock to run down for 2-player game
-        this.globClock = this.time.delayedCall(game.settings.gameTimer * 2, ()=>{
+        this.globClock = this.time.delayedCall(game.settings.gameTimer * 2 + 5000, ()=>{
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2 + 64, '(F)ire to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2 + 128,
@@ -167,8 +173,12 @@ class Play extends Phaser.Scene{
 
         //Update the displayed time
         //If the game is over, should just show 0
-        if(!this.paused)
-            this.timeDisp.text = 1 + Math.floor((game.settings.gameTimer - this.clock.getElapsed())/1000);
+        if(!this.paused){
+            if(this.scoreIndex == 0)
+                this.timeDisp.text = 1 + Math.floor((game.settings.gameTimer - this.clock.getElapsed())/1000);
+            else
+                this.timeDisp.text = 1 + Math.floor((game.settings.gameTimer * 2 + 5000 - this.globClock.getElapsed())/1000);
+        }
         else
             this.timeDisp.text = "0";
     }
