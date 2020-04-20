@@ -69,8 +69,9 @@ class Play extends Phaser.Scene{
         });
 
         //establish score.
-        this.p1Score = 0;
-
+        this.score = [0,0];
+        //Sets the current index for which score to track
+        this.scoreIndex = 0;
         //then set up the display
         let scoreConfig = {
             fontFamily: 'Courier',
@@ -85,7 +86,7 @@ class Play extends Phaser.Scene{
             fixedWidth: 100
         }
         //this tells the game what to display and how to display it?
-        this.scoreLeft = this.add.text(69, 54, this.p1Score, scoreConfig);
+        this.scoreLeft = this.add.text(69, 54, this.score[this.scoreIndex], scoreConfig);
 
         //Also want to display the multiplier
         this.multi = this.add.text(240, 54, 1 + "x", scoreConfig);
@@ -94,23 +95,41 @@ class Play extends Phaser.Scene{
         this.timeDisp = this.add.text(400, 54, game.settings.gameTimer/1000, scoreConfig);
         //game over flag
         this.gameOver = false;
+        //Side done flag
+        this.paused = false;
         //clock for the game
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, ()=>{
+            this.add.text(game.config.width/2, game.config.height/2, 'P1 Finished', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 64, 'P2 starts in 5 seconds', scoreConfig).setOrigin(0.5);
+            this.paused = true;
+        }, null, this);
+
+        //Clock timed to start 2nd player
+        this.clock = this.time.delayedCall(game.settings.gameTimer + 5000, ()=>{
+            this.paused = false;
+            this.scoreIndex = 1;
+        }, null, this);
+
+        //clock to run down for 2-player game
+        this.globClock = this.time.delayedCall(game.settings.gameTimer * 2, ()=>{
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2 + 64, '(F)ire to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
+            this.add.text(game.config.width/2, game.config.height/2 + 128,
+                           'P1 score: '+ this.score[0] + ", P2 score: "+this.score[1], scoreConfig).setOrigin(0.5);
             this.gameOver = true;
+            this.paused = true;
         }, null, this);
 
 
-        //Establish a clock to be used to prevent exhaust hanging around
     }
 
     update(currTime, dT){
         //handle post-game choices.
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyF)){
-            this.scene.restart(this.p1Score);
+            this.scene.restart(this.score);
             this.scene.restart(this.multi);
+            this.scene.restart(this.scoreIndex);
         }
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             this.scene.start("menuScene");
@@ -118,7 +137,7 @@ class Play extends Phaser.Scene{
         //scroll starfield
         this.starfield.tilePositionX -= 4;
         //update rocket
-        if(!this.gameOver){
+        if(!this.paused){
             if(this.p1Rocket.update())
                 this.multi.text = 1 + "x";
         }
@@ -131,8 +150,8 @@ class Play extends Phaser.Scene{
                 this.shipExplode(ship);
 
                 //add the score
-                this.p1Score += ship.points * this.p1Rocket.multiplier;
-                this.scoreLeft.text = this.p1Score;
+                this.score[this.scoreIndex] += ship.points * this.p1Rocket.multiplier;
+                this.scoreLeft.text = this.score[this.scoreIndex];
                 //Then figure out how multiplier should change.
                 //If this is the first hit after a miss, or first ever, or same as prior, add 10% of the points
                 if(this.p1Rocket.lastHit == -1 || this.ships[this.p1Rocket.lastHit] == ship)
@@ -148,7 +167,7 @@ class Play extends Phaser.Scene{
 
         //Update the displayed time
         //If the game is over, should just show 0
-        if(!this.gameOver)
+        if(!this.paused)
             this.timeDisp.text = 1 + Math.floor((game.settings.gameTimer - this.clock.getElapsed())/1000);
         else
             this.timeDisp.text = "0";
