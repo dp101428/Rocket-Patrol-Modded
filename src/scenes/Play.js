@@ -134,10 +134,10 @@ class Play extends Phaser.Scene{
                            'P1 score: '+ this.score[0] + ", P2 score: "+this.score[1], scoreConfig).setOrigin(0.5);
             this.gameOver = true;
             this.paused = true;
-            highScore = Math.max(this.score[0], this.score[1]);
+            highScore = Math.max(Math.max(this.score[0], this.score[1]), highScore);
             this.hiDisplay.text = "HS: " + this.highScore;
         }, null, this);
-
+        
 
     }
 
