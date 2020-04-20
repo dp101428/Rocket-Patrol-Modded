@@ -123,6 +123,7 @@ class Play extends Phaser.Scene{
             this.midText1.alpha = 0;
             this.midText2.alpha = 0;
             this.p1Rocket.x = game.config.width/2;
+            this.p1Rocket.reset();
         }, null, this);
 
         //clock to run down for 2-player game
