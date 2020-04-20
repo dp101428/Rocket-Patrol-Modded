@@ -5,6 +5,7 @@ class Spaceship extends Phaser.GameObjects.Sprite {
         //add an object to the scene, displayList, updateList
         scene.add.existing(this);
         this.points = pointValue;
+
     }
 
     update(){

@@ -11,12 +11,20 @@ class Play extends Phaser.Scene{
         this.load.spritesheet('explosion', './assets/explosion.png', {frameWidth:64, frameHeight:32,
              startFrame:0, endFrame:9});
 
-        
+        //load particle
+        this.load.image('debris', './assets/particle.png');
+        //Load other particle for exhaust
+        this.load.image('exhaust', './assets/particle2.png')
     }
     create(){
         //place tile sprite
         this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0,0);
 
+        //Define the particles for explosions
+        this.explodParticles = this.add.particles('debris');
+
+        //Also for ship exhaust
+        this.exhaust = this.add.particles('exhaust');
 
         //white rectangle borders
         this.add.rectangle(5, 5, 630, 32, 0xFFFFFF).setOrigin(0,0);
@@ -34,7 +42,19 @@ class Play extends Phaser.Scene{
                       new Spaceship(this, game.config.width + 96, 196, 'spaceship', 0, 20).setOrigin(0,0),
                       new Spaceship(this, game.config.width, 260, 'spaceship', 0, 10).setOrigin(0,0)];
         
-        
+        //Establish standard emitter config for all spaceships
+        let stdExhaust = {
+            speed:20,
+            lifespan: 250,
+            gravityX: 100,
+            quantity: 1,
+            frequency: 3,
+        }
+        //then give the spaceships all exhausts
+        this.ships.forEach((ship) => {
+            ship.exhaust = this.exhaust.createEmitter(stdExhaust);
+            ship.exhaust.startFollow(ship, 68, 16);
+        })
 
         //define all the keyboard keys
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
@@ -81,6 +101,9 @@ class Play extends Phaser.Scene{
             this.add.text(game.config.width/2, game.config.height/2 + 64, '(F)ire to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
+
+
+        //Establish a clock to be used to prevent exhaust hanging around
     }
 
     update(currTime, dT){
@@ -145,12 +168,30 @@ class Play extends Phaser.Scene{
     shipExplode(ship){
         //hide the ship since it's blowing up
         ship.alpha = 0;
+        ship.exhaust.visible = 0;
         //make the explosion on the invisible ship
         let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0,0);
+        //Make the explosion particles
+        this.explodParticles.createEmitter({
+            x: ship.x,
+            y: ship.y,
+            lifespan: 500,
+            speed: {min: 20, max:100},
+            gravityY: 300, 
+            quantity: 3,
+            frequency: 0,
+        }).explode();
         boom.anims.play('explode'); //make the explosion happen
         boom.on('animationcomplete', () => {
             ship.reset();
             ship.alpha=1;
+            //ship.exhaust.visible = 1;
+            this.time.addEvent({
+                delay: 250,
+                callback: ()=>{
+                    ship.exhaust.visible = 1;
+                }
+            })
             boom.destroy();
         });
         
